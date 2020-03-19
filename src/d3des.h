@@ -19,8 +19,11 @@
  *	(GEnie : OUTER; CIS : [71755,204])
  */
 
-#define EN0	0	/* MODE == encrypt */
-#define DE1	1	/* MODE == decrypt */
+
+#define EN0 0	/* MODE == encrypt */
+#define DE1 1	/* MODE == decrypt */
+
+
 
 extern void deskey(unsigned char *, int);
 /*		      hexkey[8]     MODE
@@ -46,6 +49,7 @@ extern void des(unsigned char *, unsigned char *);
  * internal key register) one block of eight bytes at address 'from'
  * into the block at address 'to'.  They can be the same.
  */
+
 
 /* d3des.h V5.09 rwo 9208.04 15:06 Graven Imagery
  ********************************************************************/

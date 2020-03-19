@@ -1,8 +1,14 @@
-/*
- * @file VNC_config.h
- * @date 07.01.2016
- * @author Markus Sattler
+/**
+ * \file VNC_config.h
+ * \brief Contains compile-time configuration "knobs" for the VNC server
  *
+ * \version		1.3.1
+ * \date		March 2020
+ * \author		Gerad Munsch <gmunsch@unforgivendevelopment.com>
+ * \date		07.01.2016
+ * \author		Markus Sattler
+ *
+ * \copyright \parblock
  * Copyright (c) 2015 Markus Sattler. All rights reserved.
  * This file is part of the VNC client for Arduino.
  *
@@ -20,18 +26,41 @@
  * http://www.gnu.org/licenses/gpl.html, or obtained by writing to the
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
- *
- *
+ * \endparblock
  */
 
 #ifndef VNC_CONFIG_H_
 #define VNC_CONFIG_H_
+
+
 
 /// Display
 #define VNC_ILI9341
 
 // RA8875 not fully implemented
 //#define VNC_RA8875
+
+
+#if !defined(VNC_ILI9341) && !defined(VNC_RA8875)
+#error 'At least one display device must be defined at the time of preprocessing: VNC_ILI9341 or VNC_RA8875'
+#elif defined(VNC_ILI9341) && defined(VNC_RA8875)
+#error 'Only one display device may be defined at the time of preprocessing.'
+
+#elif defined(VNC_ILI9341)
+
+#define VNC_DISPLAY VNC_ILI9341
+
+#elif defined(VNC_RA8875)
+
+#warning 'There are still some known issues with the RA8875 display; use of the ILI9341 is recommended.'
+
+#define VNC_DISPLAY VNC_RA8875
+
+#else
+
+#error 'Unknown error while trying to set VNC display!'
+
+#endif
 
 
 /// TCP layer
@@ -66,24 +95,83 @@
 #define VNC_RAW_BUFFER 15360
 #endif
 
-/// debugging
+
+/**
+ * \name Textual Debug Prints
+ *
+ * We make use of platform-specific preprocesor definitions here to ensure that the debug prints are routed to the ideal
+ * output device for a given platform.
+ *
+ * @{
+ */
+
 #ifdef ESP32
-#define DEBUG_VNC(...) Serial.printf( __VA_ARGS__ )
-#else
+
+/**
+ * \brief Prints a text string for the purpose of debugging the VNC server on the ESP32 platform
+ *
+ * \param[in]	...		Utilizes the same syntax as the standard \c printf() function
+ */
+#define DEBUG_VNC(...) Serial.printf(__VA_ARGS__)
+
+#else	/* ESP32 */
+
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_VNC(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
-#else
-#define DEBUG_VNC(...) os_printf( __VA_ARGS__ )
-#endif
-#endif
+
+/**
+ * \brief Prints a text string for the purpose of debugging the VNC server on the certain ESP platforms
+ *
+ * \param[in]	...		Utilizes the same syntax as the standard \c printf() function
+ */
+#define DEBUG_VNC(...) DEBUG_ESP_PORT.printf(__VA_ARGS__)
+
+#else	/* DEBUG_ESP_PORT */
+
+/**
+ * \brief Prints a text string for the purpose of debugging the VNC server utilizing the OS-level printf function
+ *
+ * The argument to \c DEBUG_VNC() is passwd along to the argument of the \c os_printf() function
+ *
+ * \param[in]	...		Utilizes the same syntax as the standard \c printf() function
+ */
+#define DEBUG_VNC(...) os_printf(__VA_ARGS__)
+
+#endif	/* !DEBUG_ESP_PORT */
+#endif	/* !ESP32 */
+
+
+/**
+ * \name Additional debug print macrosa
+ *
+ * These empty macros facilitate debug prints from other components of the VNC server.
+ *
+ * \note The code, as elaborated below, will cause debug prints to be discarded. Checks for the availablity of the base
+ *       \c DEBUG_VNC(...) macro is tested for functionality later on; these macros utilize that base-level macro as to
+ *       perform their duties.
+ *
+ * @{
+ */
 
 #define DEBUG_VNC_RAW(...)
 #define DEBUG_VNC_HEXTILE(...)
 #define DEBUG_VNC_RICH_CURSOR(...)
 
-#ifndef DEBUG_VNC
+/**
+ * @}
+ */
+
+
+#if !defined(DEBUG_VNC) || defined(__DOXYGEN__)
+/* \brief This macro checks for the availablity of a functional \c DEBUG_VNC(...) macro; lacking such, discard msgs */
 #define DEBUG_VNC(...)
 #endif
+
+
+/**
+ * \name Finer-grained debug output macros
+ *
+ * @{
+ */
 
 #ifndef DEBUG_VNC_RAW
 #define DEBUG_VNC_RAW(...) DEBUG_VNC( __VA_ARGS__ )
@@ -97,4 +185,12 @@
 #define DEBUG_VNC_RICH_CURSOR(...) DEBUG_VNC( __VA_ARGS__ )
 #endif
 
-#endif /* VNC_CONFIG_H_ */
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
+
+#endif	/* !VNC_CONFIG_H_ */

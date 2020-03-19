@@ -48,6 +48,10 @@
  */
 
 
+#ifndef RFBPROTO_H_
+#define RFBPROTO_H_
+
+
 /*****************************************************************************
  *
  * Structures used in several messages
@@ -61,65 +65,52 @@
  */
 
 typedef struct _rfbRectangle {
-    CARD16 x;
-    CARD16 y;
-    CARD16 w;
-    CARD16 h;
+	CARD16 x;
+	CARD16 y;
+	CARD16 w;
+	CARD16 h;
 } rfbRectangle;
 
 #define sz_rfbRectangle 8
 
 
-/*-----------------------------------------------------------------------------
- * Structure used to specify pixel format.
+/**
+ * \brief Structure used to specify pixel format.
  */
-
 typedef struct _rfbPixelFormat {
-
-    CARD8 bitsPerPixel;		/* 8,16,32 only */
-
-    CARD8 depth;		/* 8 to 32 */
-
-    CARD8 bigEndian;		/* True if multi-byte pixels are interpreted
+	CARD8 bitsPerPixel;		/*!< 8,16,32 only */
+	CARD8 depth;			/*!< 8 to 32 */
+	CARD8 bigEndian;		/*!< True if multi-byte pixels are interpreted
 				   as big endian, or if single-bit-per-pixel
 				   has most significant bit of the byte
 				   corresponding to first (leftmost) pixel. Of
 				   course this is meaningless for 8 bits/pix */
-
-    CARD8 trueColour;		/* If false then we need a "colour map" to
+	CARD8 trueColour;		/*!< If false then we need a "colour map" to
 				   convert pixels to RGB.  If true, xxxMax and
 				   xxxShift specify bits used for red, green
 				   and blue */
 
-    /* the following fields are only meaningful if trueColour is true */
-
-    CARD16 redMax;		/* maximum red value (= 2^n - 1 where n is the
+	/* the following fields are only meaningful if trueColour is true */
+	CARD16 redMax;			/*!< maximum red value (= 2^n - 1 where n is the
 				   number of bits used for red). Note this
 				   value is always in big endian order. */
-
-    CARD16 greenMax;		/* similar for green */
-
-    CARD16 blueMax;		/* and blue */
-
-    CARD8 redShift;		/* number of shifts needed to get the red
+	CARD16 greenMax;		/*!< similar for green */
+	CARD16 blueMax;			/*!< and blue */
+	CARD8 redShift;			/*!< number of shifts needed to get the red
 				   value in a pixel to the least significant
 				   bit. To find the red value from a given
 				   pixel, do the following:
 				   1) Swap pixel value according to bigEndian
-				      (e.g. if bigEndian is false and host byte
-				      order is big endian, then swap).
+					  (e.g. if bigEndian is false and host byte
+					  order is big endian, then swap).
 				   2) Shift right by redShift.
 				   3) AND with redMax (in host byte order).
 				   4) You now have the red value between 0 and
-				      redMax. */
-
-    CARD8 greenShift;		/* similar for green */
-
-    CARD8 blueShift;		/* and blue */
-
-    CARD8 pad1;
-    CARD16 pad2;
-
+					  redMax. */
+	CARD8 greenShift;		/*!< similar for green */
+	CARD8 blueShift;		/*!< and blue */
+	CARD8 pad1;
+	CARD16 pad2;
 } rfbPixelFormat;
 
 #define sz_rfbPixelFormat 16
@@ -132,9 +123,9 @@ typedef struct _rfbPixelFormat {
 
 typedef struct _rfbCapabilityInfo {
 
-    CARD32 code;		/* numeric identifier */
-    CARD8 vendorSignature[4];	/* vendor identification */
-    CARD8 nameSignature[8];	/* abbreviated option name */
+	CARD32 code;		/* numeric identifier */
+	CARD8 vendorSignature[4];	/* vendor identification */
+	CARD8 nameSignature[8];	/* abbreviated option name */
 
 } rfbCapabilityInfo;
 
@@ -142,13 +133,21 @@ typedef struct _rfbCapabilityInfo {
 #define sz_rfbCapabilityInfoName 8
 #define sz_rfbCapabilityInfo 16
 
-/*
- * Vendors known by TightVNC: standard VNC/RealVNC, TridiaVNC, and TightVNC.
+
+/**
+ * \name Vendors known by TightVNC: standard VNC/RealVNC, TridiaVNC, and TightVNC.
+ *
+ * @{
  */
 
 #define rfbStandardVendor "STDV"
 #define rfbTridiaVncVendor "TRDV"
 #define rfbTightVncVendor "TGHT"
+
+/**
+ * @}
+ */
+
 
 /*****************************************************************************
  *
@@ -182,10 +181,17 @@ typedef struct _rfbCapabilityInfo {
  */
 
 #define rfbProtocolVersionFormat "RFB %03d.%03d\n"
-#define rfbProtocolMajorVersion 3
-#define rfbProtocolMinorVersion 8
 
-typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
+#ifndef rfbProtocolMajorVersion
+#define rfbProtocolMajorVersion 3
+#endif
+
+#ifndef rfbProtocolMinorVersion
+#define rfbProtocolMinorVersion 8
+#endif
+
+/*! \brief allow extra byte for null */
+typedef char rfbProtocolVersionMsg[13];
 
 #define sz_rfbProtocolVersionMsg 12
 
@@ -226,8 +232,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
  */
 
 typedef struct _rfbTunnelingCapsMsg {
-    CARD32 nTunnelTypes;
-    /* followed by nTunnelTypes * rfbCapabilityInfo structures */
+	CARD32 nTunnelTypes;	/*!< followed by nTunnelTypes * rfbCapabilityInfo structures */
 } rfbTunnelingCapsMsg;
 
 #define sz_rfbTunnelingCapsMsg 4
@@ -259,8 +264,7 @@ typedef struct _rfbTunnelingCapsMsg {
  */
 
 typedef struct _rfbAuthenticationCapsMsg {
-    CARD32 nAuthTypes;
-    /* followed by nAuthTypes * rfbCapabilityInfo structures */
+	CARD32 nAuthTypes;	/*!< followed by nAuthTypes * rfbCapabilityInfo structures */
 } rfbAuthenticationCapsMsg;
 
 #define sz_rfbAuthenticationCapsMsg 4
@@ -313,7 +317,7 @@ typedef struct _rfbAuthenticationCapsMsg {
  */
 
 typedef struct _rfbClientInitMsg {
-    CARD8 shared;
+	CARD8 shared;
 } rfbClientInitMsg;
 
 #define sz_rfbClientInitMsg 1
@@ -328,11 +332,10 @@ typedef struct _rfbClientInitMsg {
  */
 
 typedef struct _rfbServerInitMsg {
-    CARD16 framebufferWidth;
-    CARD16 framebufferHeight;
-    rfbPixelFormat format;	/* the server's preferred pixel format */
-    CARD32 nameLength;
-    /* followed by char name[nameLength] */
+	CARD16 framebufferWidth;
+	CARD16 framebufferHeight;
+	rfbPixelFormat format;	/* the server's preferred pixel format */
+	CARD32 nameLength;	/*!< followed by char name[nameLength] */
 } rfbServerInitMsg;
 
 #define sz_rfbServerInitMsg (8 + sz_rfbPixelFormat)
@@ -352,12 +355,12 @@ typedef struct _rfbServerInitMsg {
  */
 
 typedef struct _rfbInteractionCapsMsg {
-    CARD16 nServerMessageTypes;
-    CARD16 nClientMessageTypes;
-    CARD16 nEncodingTypes;
-    CARD16 pad;			/* reserved, must be 0 */
-    /* followed by nServerMessageTypes * rfbCapabilityInfo structures */
-    /* followed by nClientMessageTypes * rfbCapabilityInfo structures */
+	CARD16 nServerMessageTypes;
+	CARD16 nClientMessageTypes;
+	CARD16 nEncodingTypes;
+	CARD16 pad;			/* reserved, must be 0 */
+	/* followed by nServerMessageTypes * rfbCapabilityInfo structures */
+	/* followed by nClientMessageTypes * rfbCapabilityInfo structures */
 } rfbInteractionCapsMsg;
 
 #define sz_rfbInteractionCapsMsg 8
@@ -383,7 +386,21 @@ typedef struct _rfbInteractionCapsMsg {
  *
  *****************************************************************************/
 
+
+/**
+ *  * \defgroup rfb_msg_types RFB Message Types
+ *
+ * @{
+ */
+
+
 /* server -> client */
+
+/**
+ *  * \defgroup rfb_msg_types_srv2cli RFB Message Types: Server-to-Client
+ *
+ * @{
+ */
 
 #define rfbFramebufferUpdate 0
 #define rfbSetColourMapEntries 1
@@ -401,7 +418,17 @@ typedef struct _rfbInteractionCapsMsg {
 #define sig_rfbFileUploadCancel "FTS_UPCN"
 #define sig_rfbFileDownloadFailed "FTS_DNFL"
 
+/**
+ * @}
+ */
+
 /* client -> server */
+
+/**
+ *  * \defgroup rfb_msg_types_cli2srv RFB Message Types: Client-to-Server
+ *
+ * @{
+ */
 
 #define rfbSetPixelFormat 0
 #define rfbFixColourMapEntries 1	/* not currently supported */
@@ -423,17 +450,19 @@ typedef struct _rfbInteractionCapsMsg {
 #define rfbEndOfContinuousUpdates 150
 #define rfbFence 248
 
+/**
+ * @}
+ */
+
 /* fence flags */
 #define rfbFenceFlagBlockBefore 1
 #define rfbFenceFlagBlockAfter 2
 #define rfbFenceFlagSyncNext 4
 #define rfbFenceFlagRequest 0x80000000
-#define rfbFenceFlagsSupported (rfbFenceFlagBlockBefore | \
-                                rfbFenceFlagBlockAfter | \
-                                rfbFenceFlagSyncNext | \
-                                rfbFenceFlagRequest)
+#define rfbFenceFlagsSupported												\
+		(rfbFenceFlagBlockBefore | rfbFenceFlagBlockAfter | rfbFenceFlagSyncNext | rfbFenceFlagRequest)
 
-								
+
 /* signatures for non-standard messages */
 #define sig_rfbFileListRequest "FTC_LSRQ"
 #define sig_rfbFileDownloadRequest "FTC_DNRQ"
@@ -442,6 +471,10 @@ typedef struct _rfbInteractionCapsMsg {
 #define sig_rfbFileDownloadCancel "FTC_DNCN"
 #define sig_rfbFileUploadFailed "FTC_UPFL"
 #define sig_rfbFileCreateDirRequest "FTC_FCDR"
+
+/**
+ * @}
+ */
 
 /*****************************************************************************
  *
@@ -553,10 +586,10 @@ typedef struct _rfbInteractionCapsMsg {
  */
 
 typedef struct _rfbFramebufferUpdateMsg {
-    CARD8 type;			/* always rfbFramebufferUpdate */
-    CARD8 pad;
-    CARD16 nRects;
-    /* followed by nRects rectangles */
+	CARD8 type;			/* always rfbFramebufferUpdate */
+	CARD8 pad;
+	CARD16 nRects;
+	/* followed by nRects rectangles */
 } rfbFramebufferUpdateMsg;
 
 #define sz_rfbFramebufferUpdateMsg 4
@@ -570,8 +603,8 @@ typedef struct _rfbFramebufferUpdateMsg {
  */
 
 typedef struct _rfbFramebufferUpdateRectHeader {
-    rfbRectangle r;
-    CARD32 encoding;		/* one of the encoding types rfbEncoding... */
+	rfbRectangle r;
+	CARD32 encoding;		/* one of the encoding types rfbEncoding... */
 } rfbFramebufferUpdateRectHeader;
 
 #define sz_rfbFramebufferUpdateRectHeader (sz_rfbRectangle + 4)
@@ -589,8 +622,8 @@ typedef struct _rfbFramebufferUpdateRectHeader {
  */
 
 typedef struct _rfbCopyRect {
-    CARD16 srcX;
-    CARD16 srcY;
+	CARD16 srcX;
+	CARD16 srcY;
 } rfbCopyRect;
 
 #define sz_rfbCopyRect 4
@@ -604,7 +637,7 @@ typedef struct _rfbCopyRect {
  */
 
 typedef struct _rfbRREHeader {
-    CARD32 nSubrects;
+	CARD32 nSubrects;
 } rfbRREHeader;
 
 #define sz_rfbRREHeader 4
@@ -618,10 +651,10 @@ typedef struct _rfbRREHeader {
  */
 
 typedef struct _rfbCoRRERectangle {
-    CARD8 x;
-    CARD8 y;
-    CARD8 w;
-    CARD8 h;
+	CARD8 x;
+	CARD8 y;
+	CARD8 w;
+	CARD8 h;
 } rfbCoRRERectangle;
 
 #define sz_rfbCoRRERectangle 4
@@ -679,25 +712,27 @@ typedef struct _rfbCoRRERectangle {
 #define rfbHextileExtractW(byte) (((byte) >> 4) + 1)
 #define rfbHextileExtractH(byte) (((byte) & 0xf) + 1)
 
-typedef struct __attribute__((packed, aligned(1))) {
-        unsigned color :16;
-        unsigned y :4;
-        unsigned x :4;
 
-        unsigned h :4;
-        unsigned w :4;
+typedef struct __attribute__((packed, aligned(1))) {
+		unsigned color :16;
+		unsigned y :4;
+		unsigned x :4;
+		unsigned h :4;
+		unsigned w :4;
 } HextileSubrectsColoured_t ;
 
 
 typedef struct __attribute__((packed, aligned(1))) {
-        unsigned y :4;
-        unsigned x :4;
+		unsigned y :4;
+		unsigned x :4;
 
-        unsigned h :4;
-        unsigned w :4;
+		unsigned h :4;
+		unsigned w :4;
 } HextileSubrects_t;
 
-#ifdef VNC_ZLIB
+
+
+#if defined(VNC_ZLIB)
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * ZLIB - zlib compression Encoding.  We have an rfbZlibHeader structure
  * giving the number of bytes to follow.  Finally the data follows in
@@ -705,14 +740,15 @@ typedef struct __attribute__((packed, aligned(1))) {
  */
 
 typedef struct _rfbZlibHeader {
-    CARD32 nBytes;
+	CARD32 nBytes;
 } rfbZlibHeader;
 
 #define sz_rfbZlibHeader 4
 
-#endif
+#endif	/* defined(VNC_ZLIB) */
 
-#ifdef VNC_TIGHT
+
+#if defined(VNC_TIGHT)
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * Tight Encoding.
  *
@@ -786,7 +822,7 @@ typedef struct _rfbZlibHeader {
  *-- The "gradient" filter pre-processes pixel data with a simple algorithm
  * which converts each color component to a difference between a "predicted"
  * intensity and the actual intensity. Such a technique does not affect
- * uncompressed data size, but helps to compress photo-like images better. 
+ * uncompressed data size, but helps to compress photo-like images better.
  * Pseudo-code for converting intensities to differences is the following:
  *
  *   P[i,j] := V[i-1,j] + V[i,j-1] - V[i-1,j-1];
@@ -871,7 +907,7 @@ typedef struct _rfbZlibHeader {
 #define rfbHextileZlibHex		(1 << 6)
 
 
-#endif
+#endif	/* defined(VNC_TIGHT) */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  * XCursor encoding. This is a special encoding used to transmit X-style
@@ -893,12 +929,12 @@ typedef struct _rfbZlibHeader {
  */
 
 typedef struct _rfbXCursorColors {
-    CARD8 foreRed;
-    CARD8 foreGreen;
-    CARD8 foreBlue;
-    CARD8 backRed;
-    CARD8 backGreen;
-    CARD8 backBlue;
+	CARD8 foreRed;
+	CARD8 foreGreen;
+	CARD8 foreBlue;
+	CARD8 backRed;
+	CARD8 backGreen;
+	CARD8 backBlue;
 } rfbXCursorColors;
 
 #define sz_rfbXCursorColors 6
@@ -924,7 +960,7 @@ typedef struct _rfbXCursorColors {
  */
 
 typedef struct {
-    CARD32 length;
+	CARD32 length;
 } rfbZRLEHeader;
 
 #define sz_rfbZRLEHeader 4
@@ -942,13 +978,13 @@ typedef struct {
  */
 
 typedef struct _rfbSetColourMapEntriesMsg {
-    CARD8 type;			/* always rfbSetColourMapEntries */
-    CARD8 pad;
-    CARD16 firstColour;
-    CARD16 nColours;
+	CARD8 type;			/* always rfbSetColourMapEntries */
+	CARD8 pad;
+	CARD16 firstColour;
+	CARD16 nColours;
 
-    /* Followed by nColours * 3 * CARD16
-       r1, g1, b1, r2, g2, b2, r3, g3, b3, ..., rn, bn, gn */
+	/* Followed by nColours * 3 * CARD16
+	   r1, g1, b1, r2, g2, b2, r3, g3, b3, ..., rn, bn, gn */
 
 } rfbSetColourMapEntriesMsg;
 
@@ -961,7 +997,7 @@ typedef struct _rfbSetColourMapEntriesMsg {
  */
 
 typedef struct _rfbBellMsg {
-    CARD8 type;			/* always rfbBell */
+	CARD8 type;			/* always rfbBell */
 } rfbBellMsg;
 
 #define sz_rfbBellMsg 1
@@ -973,11 +1009,11 @@ typedef struct _rfbBellMsg {
  */
 
 typedef struct _rfbServerCutTextMsg {
-    CARD8 type;			/* always rfbServerCutText */
-    CARD8 pad1;
-    CARD16 pad2;
-    CARD32 length;
-    /* followed by char text[length] */
+	CARD8 type;			/* always rfbServerCutText */
+	CARD8 pad1;
+	CARD16 pad2;
+	CARD32 length;
+	/* followed by char text[length] */
 } rfbServerCutTextMsg;
 
 #define sz_rfbServerCutTextMsg 8
@@ -987,13 +1023,13 @@ typedef struct _rfbServerCutTextMsg {
  */
 
 typedef struct _rfbFileListDataMsg {
-    CARD8 type;
-    CARD8 flags;
-    CARD16 numFiles;
-    CARD16 dataSize;
-    CARD16 compressedSize;
-    /* Followed by SizeData[numFiles] */
-    /* Followed by Filenames[compressedSize] */
+	CARD8 type;
+	CARD8 flags;
+	CARD16 numFiles;
+	CARD16 dataSize;
+	CARD16 compressedSize;
+	/* Followed by SizeData[numFiles] */
+	/* Followed by Filenames[compressedSize] */
 } rfbFileListDataMsg;
 
 #define sz_rfbFileListDataMsg 8
@@ -1003,12 +1039,12 @@ typedef struct _rfbFileListDataMsg {
  */
 
 typedef struct _rfbFileDownloadDataMsg {
-    CARD8 type;
-    CARD8 compressLevel;
-    CARD16 realSize;
-    CARD16 compressedSize;
-    /* Followed by File[copressedSize], 
-       but if (realSize = compressedSize = 0) followed by CARD32 modTime  */
+	CARD8 type;
+	CARD8 compressLevel;
+	CARD16 realSize;
+	CARD16 compressedSize;
+	/* Followed by File[copressedSize],
+	   but if (realSize = compressedSize = 0) followed by CARD32 modTime  */
 } rfbFileDownloadDataMsg;
 
 #define sz_rfbFileDownloadDataMsg 6
@@ -1019,10 +1055,10 @@ typedef struct _rfbFileDownloadDataMsg {
  */
 
 typedef struct _rfbFileUploadCancelMsg {
-    CARD8 type;
-    CARD8 unused;
-    CARD16 reasonLen;
-    /* Followed by reason[reasonLen] */
+	CARD8 type;
+	CARD8 unused;
+	CARD16 reasonLen;
+	/* Followed by reason[reasonLen] */
 } rfbFileUploadCancelMsg;
 
 #define sz_rfbFileUploadCancelMsg 4
@@ -1032,10 +1068,10 @@ typedef struct _rfbFileUploadCancelMsg {
  */
 
 typedef struct _rfbFileDownloadFailedMsg {
-    CARD8 type;
-    CARD8 unused;
-    CARD16 reasonLen;
-    /* Followed by reason[reasonLen] */
+	CARD8 type;
+	CARD8 unused;
+	CARD16 reasonLen;
+	/* Followed by reason[reasonLen] */
 } rfbFileDownloadFailedMsg;
 
 #define sz_rfbFileDownloadFailedMsg 4
@@ -1045,11 +1081,11 @@ typedef struct _rfbFileDownloadFailedMsg {
  */
 
 typedef struct _rfbFenceMsg {
-    CARD8 type;			/* always rfbFence */
-    CARD8 pad[3];
-    CARD32 flags;
-    CARD8 length;
-    /* Followed by char data[length] */
+	CARD8 type;			/* always rfbFence */
+	CARD8 pad[3];
+	CARD32 flags;
+	CARD8 length;
+	/* Followed by char data[length] */
 } rfbFenceMsg;
 
 #define sz_rfbFenceMsg 9
@@ -1059,16 +1095,16 @@ typedef struct _rfbFenceMsg {
  */
 
 typedef union _rfbServerToClientMsg {
-    CARD8 type;
-    rfbFramebufferUpdateMsg fu;
-    rfbSetColourMapEntriesMsg scme;
-    rfbBellMsg b;
-    rfbServerCutTextMsg sct;
-    rfbFileListDataMsg fld;
-    rfbFileDownloadDataMsg fdd;
-    rfbFileUploadCancelMsg fuc;
-    rfbFileDownloadFailedMsg fdf;
-    rfbFenceMsg f;
+	CARD8 type;
+	rfbFramebufferUpdateMsg fu;
+	rfbSetColourMapEntriesMsg scme;
+	rfbBellMsg b;
+	rfbServerCutTextMsg sct;
+	rfbFileListDataMsg fld;
+	rfbFileDownloadDataMsg fdd;
+	rfbFileUploadCancelMsg fuc;
+	rfbFileDownloadFailedMsg fdf;
+	rfbFenceMsg f;
 } rfbServerToClientMsg;
 
 
@@ -1086,10 +1122,10 @@ typedef union _rfbServerToClientMsg {
  */
 
 typedef struct _rfbSetPixelFormatMsg {
-    CARD8 type;			/* always rfbSetPixelFormat */
-    CARD8 pad1;
-    CARD16 pad2;
-    rfbPixelFormat format;
+	CARD8 type;			/* always rfbSetPixelFormat */
+	CARD8 pad1;
+	CARD16 pad2;
+	rfbPixelFormat format;
 } rfbSetPixelFormatMsg;
 
 #define sz_rfbSetPixelFormatMsg (sz_rfbPixelFormat + 4)
@@ -1103,13 +1139,13 @@ typedef struct _rfbSetPixelFormatMsg {
  */
 
 typedef struct _rfbFixColourMapEntriesMsg {
-    CARD8 type;			/* always rfbFixColourMapEntries */
-    CARD8 pad;
-    CARD16 firstColour;
-    CARD16 nColours;
+	CARD8 type;			/* always rfbFixColourMapEntries */
+	CARD8 pad;
+	CARD16 firstColour;
+	CARD16 nColours;
 
-    /* Followed by nColours * 3 * CARD16
-       r1, g1, b1, r2, g2, b2, r3, g3, b3, ..., rn, bn, gn */
+	/* Followed by nColours * 3 * CARD16
+	   r1, g1, b1, r2, g2, b2, r3, g3, b3, ..., rn, bn, gn */
 
 } rfbFixColourMapEntriesMsg;
 
@@ -1123,10 +1159,10 @@ typedef struct _rfbFixColourMapEntriesMsg {
  */
 
 typedef struct _rfbSetEncodingsMsg {
-    CARD8 type;			/* always rfbSetEncodings */
-    CARD8 pad;
-    CARD16 nEncodings;
-    /* followed by nEncodings * CARD32 encoding types */
+	CARD8 type;			/* always rfbSetEncodings */
+	CARD8 pad;
+	CARD16 nEncodings;
+	/* followed by nEncodings * CARD32 encoding types */
 } rfbSetEncodingsMsg;
 
 #define sz_rfbSetEncodingsMsg 4
@@ -1139,12 +1175,12 @@ typedef struct _rfbSetEncodingsMsg {
  */
 
 typedef struct _rfbFramebufferUpdateRequestMsg {
-    CARD8 type;			/* always rfbFramebufferUpdateRequest */
-    CARD8 incremental;
-    CARD16 x;
-    CARD16 y;
-    CARD16 w;
-    CARD16 h;
+	CARD8 type;			/* always rfbFramebufferUpdateRequest */
+	CARD8 incremental;
+	CARD16 x;
+	CARD16 y;
+	CARD16 w;
+	CARD16 h;
 } rfbFramebufferUpdateRequestMsg;
 
 #define sz_rfbFramebufferUpdateRequestMsg 10
@@ -1182,10 +1218,10 @@ typedef struct _rfbFramebufferUpdateRequestMsg {
  */
 
 typedef struct _rfbKeyEventMsg {
-    CARD8 type;			/* always rfbKeyEvent */
-    CARD8 down;			/* true if down (press), false if up */
-    CARD16 pad;
-    CARD32 key;			/* key is specified as an X keysym */
+	CARD8 type;			/* always rfbKeyEvent */
+	CARD8 down;			/* true if down (press), false if up */
+	CARD16 pad;
+	CARD32 key;			/* key is specified as an X keysym */
 } rfbKeyEventMsg;
 
 #define sz_rfbKeyEventMsg 8
@@ -1196,10 +1232,10 @@ typedef struct _rfbKeyEventMsg {
  */
 
 typedef struct _rfbPointerEventMsg {
-    CARD8 type;			/* always rfbPointerEvent */
-    CARD8 buttonMask;		/* bits 0-7 are buttons 1-8, 0=up, 1=down */
-    CARD16 x;
-    CARD16 y;
+	CARD8 type;			/* always rfbPointerEvent */
+	CARD8 buttonMask;		/* bits 0-7 are buttons 1-8, 0=up, 1=down */
+	CARD16 x;
+	CARD16 y;
 } rfbPointerEventMsg;
 
 #define rfbButton1Mask 1
@@ -1217,11 +1253,11 @@ typedef struct _rfbPointerEventMsg {
  */
 
 typedef struct _rfbClientCutTextMsg {
-    CARD8 type;			/* always rfbClientCutText */
-    CARD8 pad1;
-    CARD16 pad2;
-    CARD32 length;
-    /* followed by char text[length] */
+	CARD8 type;			/* always rfbClientCutText */
+	CARD8 pad1;
+	CARD16 pad2;
+	CARD32 length;
+	/* followed by char text[length] */
 } rfbClientCutTextMsg;
 
 #define sz_rfbClientCutTextMsg 8
@@ -1231,10 +1267,10 @@ typedef struct _rfbClientCutTextMsg {
  */
 
 typedef struct _rfbFileListRequestMsg {
-    CARD8 type;
-    CARD8 flags;
-    CARD16 dirNameSize;
-    /* Followed by char Dirname[dirNameSize] */
+	CARD8 type;
+	CARD8 flags;
+	CARD16 dirNameSize;
+	/* Followed by char Dirname[dirNameSize] */
 } rfbFileListRequestMsg;
 
 #define sz_rfbFileListRequestMsg 4
@@ -1244,11 +1280,11 @@ typedef struct _rfbFileListRequestMsg {
  */
 
 typedef struct _rfbFileDownloadRequestMsg {
-    CARD8 type;
-    CARD8 compressedLevel;
-    CARD16 fNameSize;
-    CARD32 position;
-    /* Followed by char Filename[fNameSize] */
+	CARD8 type;
+	CARD8 compressedLevel;
+	CARD16 fNameSize;
+	CARD32 position;
+	/* Followed by char Filename[fNameSize] */
 } rfbFileDownloadRequestMsg;
 
 #define sz_rfbFileDownloadRequestMsg 8
@@ -1258,11 +1294,11 @@ typedef struct _rfbFileDownloadRequestMsg {
  */
 
 typedef struct _rfbFileUploadRequestMsg {
-    CARD8 type;
-    CARD8 compressedLevel;
-    CARD16 fNameSize;
-    CARD32 position;
-    /* Followed by char Filename[fNameSize] */
+	CARD8 type;
+	CARD8 compressedLevel;
+	CARD16 fNameSize;
+	CARD32 position;
+	/* Followed by char Filename[fNameSize] */
 } rfbFileUploadRequestMsg;
 
 #define sz_rfbFileUploadRequestMsg 8
@@ -1273,12 +1309,12 @@ typedef struct _rfbFileUploadRequestMsg {
  */
 
 typedef struct _rfbFileUploadDataMsg {
-    CARD8 type;
-    CARD8 compressedLevel;
-    CARD16 realSize;
-    CARD16 compressedSize;
-    /* Followed by File[compressedSize], 
-       but if (realSize = compressedSize = 0) followed by CARD32 modTime  */
+	CARD8 type;
+	CARD8 compressedLevel;
+	CARD16 realSize;
+	CARD16 compressedSize;
+	/* Followed by File[compressedSize],
+	   but if (realSize = compressedSize = 0) followed by CARD32 modTime  */
 } rfbFileUploadDataMsg;
 
 #define sz_rfbFileUploadDataMsg 6
@@ -1288,10 +1324,10 @@ typedef struct _rfbFileUploadDataMsg {
  */
 
 typedef struct _rfbFileDownloadCancelMsg {
-    CARD8 type;
-    CARD8 unused;
-    CARD16 reasonLen;
-    /* Followed by reason[reasonLen] */
+	CARD8 type;
+	CARD8 unused;
+	CARD16 reasonLen;
+	/* Followed by reason[reasonLen] */
 } rfbFileDownloadCancelMsg;
 
 #define sz_rfbFileDownloadCancelMsg 4
@@ -1301,10 +1337,10 @@ typedef struct _rfbFileDownloadCancelMsg {
  */
 
 typedef struct _rfbFileUploadFailedMsg {
-    CARD8 type;
-    CARD8 unused;
-    CARD16 reasonLen;
-    /* Followed by reason[reasonLen] */
+	CARD8 type;
+	CARD8 unused;
+	CARD16 reasonLen;
+	/* Followed by reason[reasonLen] */
 } rfbFileUploadFailedMsg;
 
 #define sz_rfbFileUploadFailedMsg 4
@@ -1314,10 +1350,10 @@ typedef struct _rfbFileUploadFailedMsg {
  */
 
 typedef struct _rfbFileCreateDirRequestMsg {
-    CARD8 type;
-    CARD8 unused;
-    CARD16 dNameLen;
-    /* Followed by dName[dNameLen] */
+	CARD8 type;
+	CARD8 unused;
+	CARD16 dNameLen;
+	/* Followed by dName[dNameLen] */
 } rfbFileCreateDirRequestMsg;
 
 #define sz_rfbFileCreateDirRequestMsg 4
@@ -1327,12 +1363,12 @@ typedef struct _rfbFileCreateDirRequestMsg {
  */
 
 typedef struct _rfbEnableContinuousUpdatesMsg {
-    CARD8 type;			/* always rfbEnableContinuousUpdates */
-    CARD8 enable;
-    CARD16 x;
-    CARD16 y;
-    CARD16 w;
-    CARD16 h;
+	CARD8 type;			/* always rfbEnableContinuousUpdates */
+	CARD8 enable;
+	CARD16 x;
+	CARD16 y;
+	CARD16 w;
+	CARD16 h;
 } rfbEnableContinuousUpdatesMsg;
 
 #define sz_rfbEnableContinuousUpdatesMsg 10
@@ -1341,21 +1377,24 @@ typedef struct _rfbEnableContinuousUpdatesMsg {
  */
 
 typedef union _rfbClientToServerMsg {
-    CARD8 type;
-    rfbSetPixelFormatMsg spf;
-    rfbFixColourMapEntriesMsg fcme;
-    rfbSetEncodingsMsg se;
-    rfbFramebufferUpdateRequestMsg fur;
-    rfbKeyEventMsg ke;
-    rfbPointerEventMsg pe;
-    rfbClientCutTextMsg cct;
-    rfbFileListRequestMsg flr;
-    rfbFileDownloadRequestMsg fdr;
-    rfbFileUploadRequestMsg fupr;
-    rfbFileUploadDataMsg fud;
-    rfbFileDownloadCancelMsg fdc;
-    rfbFileUploadFailedMsg fuf;
-    rfbFileCreateDirRequestMsg fcdr;
-    rfbEnableContinuousUpdatesMsg ecu;
-    rfbFenceMsg f;
+	CARD8 type;
+	rfbSetPixelFormatMsg spf;
+	rfbFixColourMapEntriesMsg fcme;
+	rfbSetEncodingsMsg se;
+	rfbFramebufferUpdateRequestMsg fur;
+	rfbKeyEventMsg ke;
+	rfbPointerEventMsg pe;
+	rfbClientCutTextMsg cct;
+	rfbFileListRequestMsg flr;
+	rfbFileDownloadRequestMsg fdr;
+	rfbFileUploadRequestMsg fupr;
+	rfbFileUploadDataMsg fud;
+	rfbFileDownloadCancelMsg fdc;
+	rfbFileUploadFailedMsg fuf;
+	rfbFileCreateDirRequestMsg fcdr;
+	rfbEnableContinuousUpdatesMsg ecu;
+	rfbFenceMsg f;
 } rfbClientToServerMsg;
+
+
+#endif	/* !RFBPROTO_H_ */
